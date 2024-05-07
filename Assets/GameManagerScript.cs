@@ -8,6 +8,10 @@ public class GameManagerScript : MonoBehaviour
     //
     public GameObject playerPreFab; 
     public GameObject boxPreFab;
+    public GameObject goalPreFab;
+    public GameObject clearText;
+    public GameObject particlePreFab;
+
     int[,] map;
     GameObject[,] field;
     void PrintArray()
@@ -55,6 +59,7 @@ public class GameManagerScript : MonoBehaviour
         field[moveFrom.y,moveFrom.x].transform.position = new Vector3(moveTo.x - field.GetLength(1) / 2, -moveTo.y + field.GetLength(0) / 2, 0);
         field[moveTo.y,moveTo.x] = field[moveFrom.y,moveFrom.x];
         field[moveFrom.y,moveFrom.x] = null;
+        SetParticle(moveFrom);
         return true;
     }
     bool IsCleared()
@@ -79,12 +84,15 @@ public class GameManagerScript : MonoBehaviour
                 return false;
             }
         }
+
         Debug.Log("Clear");
         return true;
     }
     // Start is called before the first frame update
     void Start()
     {
+        Screen.SetResolution(1920, 1080, true);
+
         map = new int[,] {
             { 0,0,0,0,0},
             { 0,3,1,3,0},
@@ -114,9 +122,28 @@ public class GameManagerScript : MonoBehaviour
                         Quaternion.identity
                         );
                 }
+                if (map[y, x] == 3)
+                {
+                    field[y, x] = Instantiate(
+                        goalPreFab,
+                        new Vector3(x - map.GetLength(1) / 2, -y + map.GetLength(0) / 2, 0.01f),
+                        Quaternion.identity
+                        );
+                }
             }
         }
         //PrintArray();
+    }
+    void SetParticle(Vector2Int playerPos)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            Instantiate(
+                            particlePreFab,
+                            new Vector3(playerPos.x - map.GetLength(1) / 2, -playerPos.y + map.GetLength(0) / 2, 0.0f),
+                            Quaternion.identity
+                            );
+        }
     }
     // Update is called once per frame
     void Update()
@@ -125,29 +152,25 @@ public class GameManagerScript : MonoBehaviour
         {
             Vector2Int playerIndex = GetPlayerIndex();
             MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(1,0));
-            //PrintArray();
-            IsCleared();
+            clearText.SetActive(IsCleared());
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             Vector2Int playerIndex = GetPlayerIndex();
             MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(-1, 0));
-            //PrintArray();
-            IsCleared();
+            clearText.SetActive(IsCleared());
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             Vector2Int playerIndex = GetPlayerIndex();
             MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(0, -1));
-            //PrintArray();
-            IsCleared();
+            clearText.SetActive(IsCleared());
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             Vector2Int playerIndex = GetPlayerIndex();
             MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(0, 1));
-            //PrintArray();
-            IsCleared();
+            clearText.SetActive(IsCleared());
         }
     }
 }
