@@ -442,6 +442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPreFab: {fileID: 6199107951375996350, guid: 2652850653b7cbc428b64cc9291239b6, type: 3}
   boxPreFab: {fileID: 312062990294266803, guid: b593a72ccefb8ca449fe621413c9ee52, type: 3}
+  noMoveBoxPreFab: {fileID: 312062990294266803, guid: 1ab4e827fa5b2314186a4c774b5ba3bf, type: 3}
   goalPreFab: {fileID: 7875116485595019334, guid: 2975a440e5b255a4fb54fdb83523533c, type: 3}
   clearText: {fileID: 1604902895}
   particlePreFab: {fileID: 8998032886031354985, guid: 2eabada89412d6d4b90cbbdbcfdbef55, type: 3}
