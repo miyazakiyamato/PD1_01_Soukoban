@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Purchasing;
 using UnityEngine;
-
 public class GameManagerScript : MonoBehaviour
 {
 	//
@@ -13,12 +13,11 @@ public class GameManagerScript : MonoBehaviour
 	public GameObject goalPreFab;
 	public GameObject clearText;
 	public GameObject particlePreFab;
+	
 
 	int[,] map;
 	GameObject[,] field;
-	GameObject[,] goalField;
-	List<Vector2Int> unDo;
-	List<Vector2Int> morDo;
+	List<GameObject> goalsField;
 	void PrintArray()
 	{
 		string debugText = "";
@@ -61,8 +60,13 @@ public class GameManagerScript : MonoBehaviour
 			bool success = MoveNumber(tag, moveTo, moveTo + velocity,power - 1);
 			if (!success) { return false; }
 		}
+		if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Player")
+		{
+			
+		}
+        Undo.AddComponent<Transform>(playerPreFab);
 
-		Vector3 moveToPosition = new Vector3(moveTo.x - map.GetLength(1) / 2, -moveTo.y + map.GetLength(0) / 2, 0);
+        Vector3 moveToPosition = new Vector3(moveTo.x - map.GetLength(1) / 2, -moveTo.y + map.GetLength(0) / 2, 0);
 		field[moveFrom.y, moveFrom.x].GetComponent<move>().MoveTo(moveToPosition);
 
 		//field[moveFrom.y,moveFrom.x].transform.position = new Vector3(moveTo.x - field.GetLength(1) / 2, -moveTo.y + field.GetLength(0) / 2, 0);
@@ -105,9 +109,12 @@ public class GameManagerScript : MonoBehaviour
             for (int x = 0; x < map.GetLength(1); x++)
             {
                 Destroy(field[y, x]);
-                Destroy(goalField[y, x]);
             }
         }
+		for(int i = 0;i < goalsField.Count;i++)
+		{
+			Destroy(goalsField[i]);
+		}
         Start();
         clearText.SetActive(IsCleared());
     }
@@ -128,8 +135,9 @@ public class GameManagerScript : MonoBehaviour
             { 4,4,4,4,4,4,4,4,4,4,4},
         };
 		field = new GameObject[map.GetLength(0),map.GetLength(1)];
-		goalField = new GameObject[map.GetLength(0), map.GetLength(1)];
-		for (int y = 0;y < map.GetLength(0);y++)
+		goalsField = new List<GameObject>();
+
+        for (int y = 0;y < map.GetLength(0);y++)
 		{
 			for(int x = 0;x < map.GetLength(1); x++)
 			{
@@ -151,11 +159,11 @@ public class GameManagerScript : MonoBehaviour
 				}
 				if (map[y, x] == 3)
 				{
-					goalField[y,x] = Instantiate(
+					goalsField.Add(Instantiate(
 						goalPreFab,
 						new Vector3(x - map.GetLength(1) / 2, -y + map.GetLength(0) / 2, 0.01f),
 						Quaternion.identity
-						);
+						));
 				}
                 if (map[y, x] == 4)
                 {
@@ -212,11 +220,11 @@ public class GameManagerScript : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            
+            Undo.PerformUndo();
         }
         if (Input.GetKeyDown(KeyCode.C))
         {
-            
+            Undo.PerformRedo();
         }
     }
 }
