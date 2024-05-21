@@ -16,6 +16,7 @@ public class GameManagerScript : MonoBehaviour
 	
 
 	int[,] map;
+	int mapNum = 0;
 	GameObject[,] field;
 	List<GameObject> goalsField;
 	void PrintArray()
@@ -60,11 +61,6 @@ public class GameManagerScript : MonoBehaviour
 			bool success = MoveNumber(tag, moveTo, moveTo + velocity,power - 1);
 			if (!success) { return false; }
 		}
-		if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Player")
-		{
-			
-		}
-        Undo.AddComponent<Transform>(playerPreFab);
 
         Vector3 moveToPosition = new Vector3(moveTo.x - map.GetLength(1) / 2, -moveTo.y + map.GetLength(0) / 2, 0);
 		field[moveFrom.y, moveFrom.x].GetComponent<move>().MoveTo(moveToPosition);
@@ -99,7 +95,6 @@ public class GameManagerScript : MonoBehaviour
 			}
 		}
 
-		Debug.Log("Clear");
 		return true;
 	}
     void Reset()
@@ -123,17 +118,63 @@ public class GameManagerScript : MonoBehaviour
 	{
 		Screen.SetResolution(1920, 1080, true);
 
-		map = new int[,] {
+		
+		switch (mapNum)
+		{
+            default:
+                mapNum = 0;
+                map = new int[,] {
             { 4,4,4,4,4,4,4,4,4,4,4},
             { 4,0,0,4,0,0,0,0,3,3,4},
-			{ 4,1,0,4,0,0,0,0,4,3,4},
-			{ 4,0,0,4,0,2,2,0,0,0,4},
-			{ 4,0,0,0,0,2,0,0,0,0,4},
-			{ 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,1,0,4,0,0,0,0,4,3,4},
+            { 4,0,0,4,0,2,2,0,0,0,4},
+            { 4,0,0,0,0,2,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
             { 4,0,0,0,0,0,0,0,0,0,4},
             { 4,0,0,0,0,0,0,0,0,0,4},
             { 4,4,4,4,4,4,4,4,4,4,4},
-        };
+            };
+                break;
+            case 0:
+                map = new int[,] {
+            { 4,4,4,4,4,4,4,4,4,4,4},
+            { 4,0,0,4,0,0,0,0,3,3,4},
+            { 4,1,0,4,0,0,0,0,4,3,4},
+            { 4,0,0,4,0,2,2,0,0,0,4},
+            { 4,0,0,0,0,2,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,4,4,4,4,4,4,4,4,4,4},
+			};
+                break;
+			case 1:
+                map = new int[,] {
+            { 4,4,4,4,4,4,4,4,4,4,4},
+            { 4,0,0,0,0,0,0,0,3,3,4},
+            { 4,0,0,0,0,0,0,0,4,3,4},
+            { 4,0,0,0,0,2,2,0,0,0,4},
+            { 4,0,0,0,0,2,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,1,0,0,0,0,0,0,0,0,4},
+            { 4,4,4,4,4,4,4,4,4,4,4},
+            };
+                break;
+			case 2:
+                map = new int[,] {
+            { 4,4,4,4,4,4,4,4,4,4,4},
+            { 4,0,0,0,0,0,0,0,3,3,4},
+            { 4,0,0,0,0,0,0,0,4,3,4},
+            { 4,0,0,0,0,2,2,0,0,0,4},
+            { 4,0,0,0,0,2,0,0,0,0,4},
+            { 4,0,0,0,0,1,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,0,0,0,0,0,0,0,0,0,4},
+            { 4,4,4,4,4,4,4,4,4,4,4},
+            };
+                break;
+		}
 		field = new GameObject[map.GetLength(0),map.GetLength(1)];
 		goalsField = new List<GameObject>();
 
@@ -191,40 +232,43 @@ public class GameManagerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.RightArrow))
+		if (!IsCleared())
 		{
-			Vector2Int playerIndex = GetPlayerIndex();
-			MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(1,0));
-			clearText.SetActive(IsCleared());
-		}
-		if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                Vector2Int playerIndex = GetPlayerIndex();
+                MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(1, 0));
+                clearText.SetActive(IsCleared());
+            }
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                Vector2Int playerIndex = GetPlayerIndex();
+                MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(-1, 0));
+                clearText.SetActive(IsCleared());
+            }
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                Vector2Int playerIndex = GetPlayerIndex();
+                MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(0, -1));
+                clearText.SetActive(IsCleared());
+            }
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                Vector2Int playerIndex = GetPlayerIndex();
+                MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(0, 1));
+                clearText.SetActive(IsCleared());
+            }
+        }
+		else
 		{
-			Vector2Int playerIndex = GetPlayerIndex();
-			MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(-1, 0));
-			clearText.SetActive(IsCleared());
-		}
-		if (Input.GetKeyDown(KeyCode.UpArrow))
-		{
-			Vector2Int playerIndex = GetPlayerIndex();
-			MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(0, -1));
-			clearText.SetActive(IsCleared());
-		}
-		if (Input.GetKeyDown(KeyCode.DownArrow))
-		{
-			Vector2Int playerIndex = GetPlayerIndex();
-			MoveNumber("Player", playerIndex, playerIndex + new Vector2Int(0, 1));
-			clearText.SetActive(IsCleared());
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				mapNum++;
+                Reset();
+            }
 		}
 		if (Input.GetKeyDown(KeyCode.R)) {
 			Reset();
-        }
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            Undo.PerformUndo();
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            Undo.PerformRedo();
         }
     }
 }
